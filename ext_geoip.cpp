@@ -759,7 +759,7 @@ IMPLEMENT_THREAD_LOCAL(geoipGlobals, s_geoip_globals);
 
 class geoipExtension: public Extension {
     public:
-        geoipExtension(): Extension("geoip", "1.1.1-dev") {}
+        geoipExtension(): Extension("geoip", "1.1.2-fs") {}
 
         virtual void threadInit() override {
             IniSetting::Bind(
@@ -767,14 +767,7 @@ class geoipExtension: public Extension {
                 IniSetting::PHP_INI_ALL,
                 "geoip.custom_directory",
                 "",
-                IniSetting::SetAndGet<std::string>(
-#if LIBGEOIP_VERSION >= 1004001
-                    updateCustomDirectory,
-#else
-                    nullptr,
-#endif
-                    nullptr
-                ),
+                IniSetting::SetAndGet<std::string>(nullptr, nullptr),
                 &s_geoip_globals->custom_directory
             );
         }
@@ -821,8 +814,6 @@ class geoipExtension: public Extension {
             HHVM_FE(geoip_time_zone_by_country_and_region);
 #endif
 
-            loadSystemlib();
-
 #if LIBGEOIP_VERSION >= 1004001
             char *custom_directory = (char *) s_geoip_globals->custom_directory.c_str();
 
@@ -830,40 +821,9 @@ class geoipExtension: public Extension {
                 GeoIP_setup_custom_directory(custom_directory);
             }
 #endif
-            Lock lock(filename_mutex);
 
-            GeoIP_db_avail(GEOIP_COUNTRY_EDITION);
+            loadSystemlib();
         }
-
-#if LIBGEOIP_VERSION >= 1004001
-    private:
-        static bool updateCustomDirectory(const std::string& value) {
-            s_geoip_globals->custom_directory = value.data();
-            char *custom_directory = (char *) s_geoip_globals->custom_directory.c_str();
-            Lock lock(filename_mutex);
-
-#if LIBGEOIP_VERSION >= 1004007
-            GeoIP_cleanup();
-#else
-            if (GeoIPDBFileName != NULL) {
-                int i;
-
-                for (i = 0; i < NUM_DB_TYPES; i++) {
-                    if (GeoIPDBFileName[i]) {
-                        free(GeoIPDBFileName[i]);
-                    }
-                }
-
-                free(GeoIPDBFileName);
-                GeoIPDBFileName = NULL;
-            }
-#endif
-            GeoIP_setup_custom_directory(*custom_directory ? custom_directory : NULL);
-            GeoIP_db_avail(GEOIP_COUNTRY_EDITION);
-
-            return true;
-        }
-#endif
 } s_geoip_extension;
 
 HHVM_GET_MODULE(geoip);
