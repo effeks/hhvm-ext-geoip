@@ -761,17 +761,6 @@ class geoipExtension: public Extension {
     public:
         geoipExtension(): Extension("geoip", "1.1.2-fs") {}
 
-        virtual void threadInit() override {
-            IniSetting::Bind(
-                this,
-                IniSetting::PHP_INI_ALL,
-                "geoip.custom_directory",
-                "",
-                IniSetting::SetAndGet<std::string>(nullptr, nullptr),
-                &s_geoip_globals->custom_directory
-            );
-        }
-
         virtual void moduleInit() override {
             Native::registerConstant<KindOfInt64>(s_GEOIP_COUNTRY_EDITION.get(), k_GEOIP_COUNTRY_EDITION);
             Native::registerConstant<KindOfInt64>(s_GEOIP_REGION_EDITION_REV0.get(), k_GEOIP_REGION_EDITION_REV0);
@@ -812,14 +801,6 @@ class geoipExtension: public Extension {
             HHVM_FE(geoip_region_name_by_code);
             HHVM_FE(geoip_setup_custom_directory);
             HHVM_FE(geoip_time_zone_by_country_and_region);
-#endif
-
-#if LIBGEOIP_VERSION >= 1004001
-            char *custom_directory = (char *) s_geoip_globals->custom_directory.c_str();
-
-            if (*custom_directory) {
-                GeoIP_setup_custom_directory(custom_directory);
-            }
 #endif
 
             loadSystemlib();
