@@ -15,6 +15,8 @@ On Ubuntu 12.04, you need to install the "libgeoip-dev" and "libgeoip1" packages
 
 Requires HHVM 3.0 or later.
 
+Tested and working on 3.12.1.
+
 If you have already built hhvm from source, build the `geoip.so` file (the dynamically-loadable extension) using:
 
 ~~~
