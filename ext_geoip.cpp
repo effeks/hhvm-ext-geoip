@@ -759,7 +759,7 @@ IMPLEMENT_THREAD_LOCAL(geoipGlobals, s_geoip_globals);
 
 class geoipExtension: public Extension {
     public:
-        geoipExtension(): Extension("geoip", "1.1.2-fs") {}
+        geoipExtension(): Extension("geoip", "1.1.3-fs") {}
 
         virtual void moduleInit() override {
             Native::registerConstant<KindOfInt64>(s_GEOIP_COUNTRY_EDITION.get(), k_GEOIP_COUNTRY_EDITION);
