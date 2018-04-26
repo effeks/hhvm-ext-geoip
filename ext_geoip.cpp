@@ -755,7 +755,7 @@ struct geoipGlobals {
     std::string custom_directory;
 };
 
-IMPLEMENT_THREAD_LOCAL(geoipGlobals, s_geoip_globals);
+THREAD_LOCAL(geoipGlobals, s_geoip_globals);
 
 class geoipExtension: public Extension {
     public:
